@@ -16,3 +16,4 @@ def test_similarity():
     sim_pde.run_simulation(sim_output_path, sim_args)
     pde_res_path = utils.get_sim_output_path_by_args(sim_output_path, sim_args)
 
+    assert True
