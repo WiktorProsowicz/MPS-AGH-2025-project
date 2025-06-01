@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mps_agh_2025_project"
+version = "0.1.0"
+requires-python=">=3.9"
+dependencies = [
+    "PyMPDATA"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov"
+]
+
+[tool.coverage.report]
+fail_under = 90
