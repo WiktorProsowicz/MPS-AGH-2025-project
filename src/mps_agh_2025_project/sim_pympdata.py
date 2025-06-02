@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """Contains functions for running the simulation using PyMPDATA."""
 
-
-import utils
 import logging
+
+from mps_agh_2025_project import utils
+
 
 def run_simulation(sim_output_path: str,
                    args: utils.SimulationArgs):
