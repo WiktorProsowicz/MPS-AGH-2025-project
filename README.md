@@ -15,5 +15,5 @@ pip install -e path/to/fork/PyMPDATA
 
 2. Install the project:
 ```
-pip install -e .
+pip install -e .[dev]
 ```
