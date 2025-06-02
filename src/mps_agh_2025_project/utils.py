@@ -1,7 +1,8 @@
 """Contains project-wide utility functions."""
 
-import dataclasses
 import os
+import dataclasses
+
 
 @dataclasses.dataclass(frozen=True)
 class SimulationArgs:

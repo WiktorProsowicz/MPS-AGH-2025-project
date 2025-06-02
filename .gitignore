@@ -1,8 +1,10 @@
 .coverage
 .venv/
+.venv-github/
 build/
 src/mps_agh_2025_project.egg-info/
 **/__pycache__/
 uv.lock
 test_results/
 .vscode/
+.pytest_cache/
