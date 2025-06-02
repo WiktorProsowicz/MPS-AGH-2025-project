@@ -8,7 +8,7 @@ from pde import PDE, CartesianGrid, MemoryStorage, ScalarField, plot_kymograph
 from mps_agh_2025_project import utils
 
 
-# def run_simulation(sim_output_path: str,
+# def run_simulation(
 #                    args: utils.SimulationArgs):
 #     """Runs the simulation using py-pde."""
     
@@ -27,7 +27,8 @@ def run_simulation(
     bc_value=0,
     tracker_interval=1,
     display_plot=False,
-    plot_save_path=None
+    plot_save_path=None,
+    sim_output_path: str | None = None
 ):
     term_1 = f"({diffusivity_expr}) * laplace(c)"
     term_2 = f"dot(gradient({diffusivity_expr}), gradient(c))"
@@ -42,8 +43,8 @@ def run_simulation(
     if display_plot:
         plot_kymograph(storage)
 
-    if plot_save_path:
-        plot_kymograph(storage, filename=plot_save_path, action="none")
+    if sim_output_path:
+        plot_kymograph(storage, filename=sim_output_path, action="none")
 
     return res, storage
 
