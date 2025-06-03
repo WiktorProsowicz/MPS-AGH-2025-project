@@ -19,6 +19,7 @@ def run_tests() -> None:
 
     shutil.rmtree(os.path.join(HOME_PATH, 'test_results'), ignore_errors=True)
     os.makedirs(os.path.join(HOME_PATH, 'test_results'))
+    os.makedirs(os.path.join(HOME_PATH, 'test_results', 'sim_output'), exist_ok=True)
 
     current_env["TEST_RESULTS_PATH"] = os.path.join(HOME_PATH, 'test_results')
 
