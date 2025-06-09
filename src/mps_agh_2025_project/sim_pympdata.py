@@ -3,6 +3,7 @@
 
 
 import logging
+import os
 
 from mps_agh_2025_project import utils
 
@@ -13,12 +14,12 @@ from PyMPDATA.boundary_conditions import Constant
 
 
 def run_simulation(sim_output_path: str,
-                   args: utils.SimulationArgs):
+                   args: utils.SimulationArgs) -> utils.SimulationResult:
     """Runs the simulation using PyMPDATA."""
 
     output_path = utils.get_sim_output_path_by_args(sim_output_path, args)
 
-    logging.debug(
+    logging.info(
         'Running PyMPDATA simulation with output path: %s', output_path)
 
     xmin, xmax = args.grid_bounds
@@ -83,40 +84,55 @@ def run_simulation(sim_output_path: str,
 
     logging.info("Simulation completed!")
 
+    res_kymo = np.empty((int(args.sim_time), args.grid_points))
+    interval = int(1 / args.dt)
+
+    for i in range(int(args.sim_time)):
+        step_data = kymo[i * interval + 1: (i + 1) * interval + 1]
+        res_kymo[i] = step_data[step_data.shape[0] // 2]
+    
+    res_kymo = np.concat((kymo[0:1], res_kymo), axis=0)
+
     # ── plot ───────────────────────────────────────────────────────────────────────
-    T = np.linspace(0, args.sim_time, n_steps + 1)
+    T = np.linspace(0, args.sim_time, int(args.sim_time) + 1)
     X, Tgrid = np.meshgrid(x, T)
 
-    plt.figure(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(10, 6))
 
     # Main kymograph
-    plt.subplot(2, 2, (1, 3))
-    plt.pcolormesh(X, Tgrid, kymo, shading="auto")
-    plt.colorbar(label="c(x,t)")
-    plt.xlabel("x")
-    plt.ylabel("Time")
-    plt.title("Native PyMPDATA Heterogeneous Diffusion")
+    ax.pcolormesh(X, Tgrid, res_kymo, shading="auto")
+    # ax.set_colorbar(label="c(x,t)")
+    ax.set_xlabel("x")
+    ax.set_ylabel("Time")
+    ax.set_title("Native PyMPDATA Heterogeneous Diffusion")
+
+    fig.savefig(
+        os.path.join(output_path, "kymograph.png"))
+
+    fig, ax = plt.subplots(figsize=(10, 6))
 
     # Diffusivity profile
-    plt.subplot(2, 2, 2)
-    plt.plot(x, D_field, "b-", linewidth=2)
-    plt.xlabel("x")
-    plt.ylabel("D(x)")
-    plt.title("Heterogeneous Diffusivity")
-    plt.grid(True, alpha=0.3)
+    ax.plot(x, D_field, "b-", linewidth=2)
+    ax.set_xlabel("x")
+    ax.set_ylabel("D(x)")
+    ax.set_title("Heterogeneous Diffusivity")
+    ax.grid(True, alpha=0.3)
+
+    fig.savefig(os.path.join(output_path, "diffusivity_profile.png"))
+
+    fig, ax = plt.subplots(figsize=(10, 6))
 
     # Final solution
-    plt.subplot(2, 2, 4)
-    plt.plot(x, kymo[0], "k--", alpha=0.7, label="t=0")
-    plt.plot(x, kymo[-1], "r-", label=f"t={args.sim_time}")
-    plt.xlabel("x")
-    plt.ylabel("c(x)")
-    plt.title("Initial vs Final")
-    plt.legend()
-    plt.grid(True, alpha=0.3)
+    ax.plot(x, kymo[0], "k--", alpha=0.7, label="t=0")
+    ax.plot(x, kymo[-1], "r-", label=f"t={args.sim_time}")
+    ax.set_xlabel("x")
+    ax.set_ylabel("c(x)")
+    ax.set_title("Initial vs Final")
+    ax.legend()
+    ax.grid(True, alpha=0.3)
 
-    plt.tight_layout()
-    plt.show()
+    fig.savefig(os.path.join(output_path, "initial_vs_final.png"))
+
 
     # ── Summary statistics ─────────────────────────────────────────────────────────
     logging.info(
@@ -124,4 +140,8 @@ def run_simulation(sim_output_path: str,
     )
     logging.info(
         f"Relative mass change: {abs(kymo[-1].sum() - kymo[0].sum()) / kymo[0].sum() * 100:.2e}%"
+    )
+
+    return utils.SimulationResult(
+        result_matrix=res_kymo
     )
